@@ -6,18 +6,18 @@ df= pd.read_csv(r"D:\Projects\Building-an-ANN-from-scratch-\datasets\heart_disea
 
 numeric_cols = ['thalch','oldpeak','chol','trestbps']
 binary_cols= ['exang','fbs']
-categoical_cols= ['restecg','slope']
+categorical_cols= ['restecg','slope']
 
 for col in numeric_cols:
-    df[col]=df[col].fillna(df[col].mean()) #filling the columns which has ~50 missing values
+    df[col]=df[col].fillna(df[col].mean()) #filling the columns which has <50% missing values
 
 for col in binary_cols:
     df[col]= df[col].fillna(df[col].mode()[0])
     
-for col in categoical_cols:
+for col in categorical_cols:
     df[col]= df[col].fillna(df[col].mode()[0])
 
-df= df.drop(columns=['thal','ca'])
+df= df.drop(columns=['thal','ca'])#dropping columns with more than 50% missing values
 
 #missing_percent = df.isnull().mean() * 100
 #print(missing_percent)
@@ -28,7 +28,8 @@ obj_cols= df.select_dtypes(include=['object','string']).columns
 
 df = pd.get_dummies(df, columns=obj_cols, drop_first=True) #using one hot encoding to encode the str and object dtypes so it doesnt break our ANN
 df=df.drop('id',axis=1) # drrop the id column cuz its meaningless
-df= df.astype(int) #Convert bool to int 
+bool_cols = df.select_dtypes(include='bool').columns
+df[bool_cols] = df[bool_cols].astype(int)
 
 X= df.drop('num',axis=1).values #X are the inputs
 y= df['num'].values #THis is the result
@@ -45,4 +46,4 @@ y= y.reshape(1,-1)# reshaping for ANN
 print("X shape:", X.shape)
 print("Y shape:", y.shape)
 
-#print(df.head())
+print(df.head())
