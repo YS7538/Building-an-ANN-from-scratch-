@@ -1,7 +1,7 @@
 import numpy as np 
 import pandas as pd
 
-df= pd.read_csv(r"D:\Projects\Building-an-ANN-from-scratch-\datasets\heart_disease_uci.csv")
+df= pd.read_csv(r"D:\Projects\Building-an-ANN-from-scratch-\data\heart_disease_uci.csv")
 
 
 numeric_cols = ['thalch','oldpeak','chol','trestbps']
@@ -46,4 +46,8 @@ y= y.reshape(1,-1)# reshaping for ANN
 print("X shape:", X.shape)
 print("Y shape:", y.shape)
 
-print(df.head())
+if __name__ == "__main__":
+    print(df.head())
+
+def get_data():
+    return X,y
