@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from data.preprocessing import get_data
 
 
-X,y= get_data()
+X_train,y_train,X_test,y_test= get_data()
 losses= []
 #Initializing parameters
 def parameters(X_n,y_n,h_n):
-    np.random.seed(42)
+    np.random.seed(100)
     
     W1= np.random.randn(h_n,X_n)
     b1= np.zeros((h_n,1))
@@ -26,7 +26,7 @@ def sigmoid(Z):
 
 
 #Forward Pass (Formula used:- Z= W.X + b)
-def forward_pass(X,W1,b1,W2,b2):
+def forward_pass(X_train,W1,b1,W2,b2):
     
     #Current shapes
     #print("W1:", W1.shape)
@@ -34,7 +34,7 @@ def forward_pass(X,W1,b1,W2,b2):
     #print("W2:", W2.shape)
     
     
-    Z1= np.dot(W1,X)+b1
+    Z1= np.dot(W1,X_train)+b1
     A1= relu(Z1)
     
     Z2= np.dot(W2,A1)+b2
@@ -53,16 +53,12 @@ def Loss(A2,y):
     
     return loss
 
-X_n= X.shape[0]
+X_n= X_train.shape[0]
 h_n= 10
 y_n=1
 
 W1,b1,W2,b2= parameters(X_n,y_n,h_n)
-Z1,A1,Z2,A2= forward_pass(X,W1,b1,W2,b2)
 
-loss= Loss(A2,y)
-
-print("Loss= ",loss)
 
 #Backpropogation
 
@@ -91,16 +87,12 @@ epochs = 1000
 lr = 0.01
 
 for i in range(epochs):
-    Z1, A1, Z2, A2 = forward_pass(X, W1, b1, W2, b2)
+    Z1, A1, Z2, A2 = forward_pass(X_train, W1, b1, W2, b2)
     
-    if abs(losses[-1] - losses[-2]) < 1e-5:  #early stopping
-        print("Stopping early at epoch", i)
-        break
-    
-    loss = Loss(A2, y)
+    loss = Loss(A2, y_train)
     losses.append(loss)
     
-    dW1, db1, dW2, db2 = backprop(X, y, Z1, A1, Z2, A2, W2)
+    dW1, db1, dW2, db2 = backprop(X_train, y_train, Z1, A1, Z2, A2, W2)
     
     W1, b1, W2, b2 = update(W1, b1, W2, b2, dW1, db1, dW2, db2, lr)
     
@@ -108,9 +100,16 @@ for i in range(epochs):
         print("Loss:", loss)
 
 
-preds = (A2 > 0.5).astype(int)
-accuracy = np.mean(preds == y)
-print("Accuracy percentage:", accuracy*100)
+_, _, _, A2_train = forward_pass(X_train, W1, b1, W2, b2)
+train_preds = (A2_train > 0.5).astype(int)
+train_acc = np.mean(train_preds == y_train)
+
+_, _, _, A2_test = forward_pass(X_test, W1, b1, W2, b2)
+test_preds = (A2_test > 0.5).astype(int)
+test_acc = np.mean(test_preds == y_test)
+
+print("Train Accuracy:", train_acc * 100)
+print("Test Accuracy:", test_acc * 100)
 
 #plot losses
 plt.plot(losses)
