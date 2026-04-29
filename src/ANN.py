@@ -1,8 +1,10 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from data.preprocessing import get_data
 
 
 X,y= get_data()
+losses= []
 #Initializing parameters
 def parameters(X_n,y_n,h_n):
     np.random.seed(42)
@@ -91,7 +93,12 @@ lr = 0.01
 for i in range(epochs):
     Z1, A1, Z2, A2 = forward_pass(X, W1, b1, W2, b2)
     
+    if abs(losses[-1] - losses[-2]) < 1e-5:  #early stopping
+        print("Stopping early at epoch", i)
+        break
+    
     loss = Loss(A2, y)
+    losses.append(loss)
     
     dW1, db1, dW2, db2 = backprop(X, y, Z1, A1, Z2, A2, W2)
     
@@ -104,3 +111,10 @@ for i in range(epochs):
 preds = (A2 > 0.5).astype(int)
 accuracy = np.mean(preds == y)
 print("Accuracy percentage:", accuracy*100)
+
+#plot losses
+plt.plot(losses)
+plt.xlabel("Epochs")
+plt.ylabel("loss")
+plt.title("Epochs vs loss")
+plt.show()

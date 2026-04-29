@@ -1,5 +1,6 @@
 import numpy as np 
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 df= pd.read_csv(r"D:\Projects\Building-an-ANN-from-scratch-\data\heart_disease_uci.csv")
 
@@ -49,5 +50,18 @@ print("Y shape:", y.shape)
 if __name__ == "__main__":
     print(df.head())
 
+X= X.T
+y=y.T
+
+X_train,y_train,X_test,y_test= train_test_split(
+    X,y,test_size=0.2,random_state=42
+)
+
+X_train= X_train.T
+y_train= y_train.T
+X_test= X_test.T
+y_test= y_test.T
+
+
 def get_data():
-    return X,y
+    return X_train,y_train,X_test,y_test
