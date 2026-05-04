@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 from data.preprocessing import get_data
 
 
@@ -128,6 +127,7 @@ for h_n in layers:
     plt.show()'''
     losses.clear()
 
+results.sort(key=lambda x: x[2], reverse=True)
 print("\nComparison Table:")
 print("Hidden\tTrain Acc\tTest Acc")
 
