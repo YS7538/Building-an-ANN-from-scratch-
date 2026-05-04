@@ -60,7 +60,7 @@ def Loss(A2,y,W1,W2,lambda_):
 X_n= X_train.shape[0]
 layers= [5,10,20,40,50]
 y_n=1
-
+results=[]
 
 for h_n in layers:
     
@@ -94,6 +94,7 @@ for h_n in layers:
     epochs = 1000
     lr = 0.01
     lambda_=0.1
+    
 
     for i in range(epochs):
         Z1, A1, Z2, A2 = forward_pass(X_train, W1, b1, W2, b2)
@@ -117,9 +118,7 @@ for h_n in layers:
     test_preds = (A2_test > 0.5).astype(int)
     test_acc = np.mean(test_preds == y_test)
 
-    print(f"Train Accuracy for h_n= {h_n}:", train_acc * 100)
-    print(f"Train Accuracy for h_n= {h_n}:", test_acc * 100)
-    print()
+    results.append((h_n, train_acc * 100, test_acc * 100))
     
     #plot losses(skipping for now)
     '''plt.plot(losses)
@@ -129,4 +128,8 @@ for h_n in layers:
     plt.show()'''
     losses.clear()
 
+print("\nComparison Table:")
+print("Hidden\tTrain Acc\tTest Acc")
 
+for h, train, test in results:
+    print(f"{h}\t{train:.2f}\t\t{test:.2f}")
