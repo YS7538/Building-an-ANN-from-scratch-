@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 from data.preprocessing import get_data
+
 
 
 X_train,y_train,X_test,y_test= get_data()
@@ -42,7 +44,7 @@ def forward_pass(X_train,W1,b1,W2,b2):
     return Z1,A1,Z2,A2
 
 #Loss Calculation
-def Loss(A2,y):
+def Loss(A2,y,W1,W2,lambda_):
     m= y.shape[1]
     
     #prevent undefined log(0)
@@ -50,10 +52,13 @@ def Loss(A2,y):
     
     loss = - (1/m) * np.sum(y*np.log(A2) + (1-y)*np.log(1-A2))
     
-    return loss
+    # L2 regularization
+    l2 = (lambda_/(2*m)) * (np.sum(W1**2) + np.sum(W2**2))
+    
+    return loss+l2
 
 X_n= X_train.shape[0]
-layers= [4,5,6,7,8,9,10]
+layers= [5,10,20,40,50]
 y_n=1
 
 
@@ -65,15 +70,15 @@ for h_n in layers:
 
     #Backpropogation
 
-    def backprop(X,y,Z1,A1,Z2,A2,W2):
+    def backprop(X,y,Z1,A1,Z2,A2,W2,lambda_):
         m = X.shape[1]
         
         dZ2 = A2 - y
-        dW2 = (1/m) * np.dot(dZ2, A1.T)
+        dW2 = (1/m) * np.dot(dZ2, A1.T) + (lambda_/m) * W2
         db2 = (1/m) * np.sum(dZ2, axis=1, keepdims=True)
         
         dZ1 = np.dot(W2.T, dZ2) * (Z1 > 0)
-        dW1 = (1/m) * np.dot(dZ1, X.T)
+        dW1 = (1/m) * np.dot(dZ1, X.T) + (lambda_/m) * W1
         db1 = (1/m) * np.sum(dZ1, axis=1, keepdims=True)
         
         return dW1, db1, dW2, db2
@@ -88,14 +93,15 @@ for h_n in layers:
 
     epochs = 1000
     lr = 0.01
+    lambda_=0.1
 
     for i in range(epochs):
         Z1, A1, Z2, A2 = forward_pass(X_train, W1, b1, W2, b2)
         
-        loss = Loss(A2, y_train)
+        loss = Loss(A2, y_train,W1,W2,lambda_)
         losses.append(loss)
         
-        dW1, db1, dW2, db2 = backprop(X_train, y_train, Z1, A1, Z2, A2, W2)
+        dW1, db1, dW2, db2 = backprop(X_train, y_train, Z1, A1, Z2, A2, W2,lambda_)
         
         W1, b1, W2, b2 = update(W1, b1, W2, b2, dW1, db1, dW2, db2, lr)
         
